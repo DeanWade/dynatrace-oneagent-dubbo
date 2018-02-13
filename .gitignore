@@ -61,3 +61,7 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+/target/
+.classpath
+.project
+dependency-reduced-pom.xml
