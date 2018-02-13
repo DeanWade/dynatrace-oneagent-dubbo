@@ -1,0 +1,2 @@
+dtP1=com.dynatrace.oneagent.sdk.dubbo.DynatraceProviderFilter
+dtC1=com.dynatrace.oneagent.sdk.dubbo.DynatraceConsumerFilter
