@@ -11,7 +11,7 @@ import com.dynatrace.oneagent.sdk.OneAgentSDKFactory;
 import com.dynatrace.oneagent.sdk.api.IncomingRemoteCallTracer;
 import com.dynatrace.oneagent.sdk.api.OneAgentSDK;
 
-@Activate(group = Constants.PROVIDER)
+@Activate(group = Constants.PROVIDER, order = Integer.MIN_VALUE)
 public class DynatraceProviderFilter implements Filter {
 
 	private static final String DYNATRACE_TAG_KEY = "dtdTraceTagInfo";

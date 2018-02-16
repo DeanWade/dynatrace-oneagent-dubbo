@@ -12,7 +12,7 @@ import com.dynatrace.oneagent.sdk.api.OneAgentSDK;
 import com.dynatrace.oneagent.sdk.api.OutgoingRemoteCallTracer;
 import com.dynatrace.oneagent.sdk.api.enums.ChannelType;
 
-@Activate(group = Constants.CONSUMER)
+@Activate(group = Constants.CONSUMER, order = Integer.MAX_VALUE)
 public class DynatraceConsumerFilter implements Filter {
 
 	private static final String DYNATRACE_TAG_KEY = "dtdTraceTagInfo";
