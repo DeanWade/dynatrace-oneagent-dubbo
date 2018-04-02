@@ -2,6 +2,7 @@ package com.dynatrace.oneagent.sdk.dubbo;
 
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.extension.Activate;
+import com.alibaba.dubbo.common.logger.LoggerFactory;
 import com.alibaba.dubbo.rpc.Filter;
 import com.alibaba.dubbo.rpc.Invocation;
 import com.alibaba.dubbo.rpc.Invoker;
@@ -14,17 +15,24 @@ import com.dynatrace.oneagent.sdk.api.OneAgentSDK;
 @Activate(group = Constants.PROVIDER, order = Integer.MIN_VALUE)
 public class DynatraceProviderFilter implements Filter {
 
-	private static final String DYNATRACE_TAG_KEY = "dtdTraceTagInfo";
-	
+//    private static final com.alibaba.dubbo.common.logger.Logger logger = LoggerFactory.getLogger(DynatraceProviderFilter.class);
+
+	private static final String DYNATRACE_TAG_KEY = "dynatrace-trace-tag";
+
+    private static final String DYNATRACE_DUBBO_DISABLED = "dynatrace.dubbo.disabled";
+
 	private static final String DYNATRACE_DUBBO_SERVICE_FULLNAME = "dynatrace.dubbo.service.fullname";
 
 	private final OneAgentSDK oneAgentSdk;
-	
+
+    private boolean isDisabled = false;
+
 	private boolean isFullName = false;
 
 	public DynatraceProviderFilter() {
 		oneAgentSdk = OneAgentSDKFactory.createInstance();
-		isFullName=Boolean.parseBoolean(System.getProperty(DYNATRACE_DUBBO_SERVICE_FULLNAME));
+        isDisabled=Boolean.parseBoolean(System.getProperty(DYNATRACE_DUBBO_DISABLED));
+        isFullName=Boolean.parseBoolean(System.getProperty(DYNATRACE_DUBBO_SERVICE_FULLNAME));
 	}
 
 	private boolean isActive() {
@@ -41,6 +49,9 @@ public class DynatraceProviderFilter implements Filter {
 	}
 
 	public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
+	    if(isDisabled){
+	        return invoker.invoke(invocation);
+        }
 		IncomingRemoteCallTracer incomingRemoteCall = null;
 		try {
 			String tagString = invocation.getAttachments().get(DYNATRACE_TAG_KEY);
@@ -53,8 +64,8 @@ public class DynatraceProviderFilter implements Filter {
 				incomingRemoteCall.start();
 			}
 		} catch (Throwable t) {
+            System.out.println(t.toString());
 		}
-
 		Result result = null;
 		try {
 			result = invoker.invoke(invocation);
