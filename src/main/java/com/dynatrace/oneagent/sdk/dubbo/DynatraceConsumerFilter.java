@@ -20,9 +20,9 @@ public class DynatraceConsumerFilter implements Filter {
 
 //    private static final com.alibaba.dubbo.common.logger.Logger logger = LoggerFactory.getLogger(DynatraceConsumerFilter.class);
 
-    private static final String DYNATRACE_TAG_KEY = "dynatrace-trace-tag";
+    private static final String DYNATRACE_TAG_KEY = "x-dynatrace-tag";
 
-    private static final String DYNATRACE_DUBBO_DISABLED = "dynatrace.dubbo.disabled";
+    private static final String DYNATRACE_DUBBO_DISABLED = "dynatrace.dubbo.disable";
 
 	private static final String DYNATRACE_DUBBO_SERVICE_FULLNAME = "dynatrace.dubbo.service.fullname";
 
