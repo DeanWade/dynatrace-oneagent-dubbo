@@ -4,7 +4,7 @@
 
 	<groupId>com.dynatrace</groupId>
 	<artifactId>dynatrace-oneagent-dubbo</artifactId>
-	<version>1.0.3</version>
+	<version>1.1.0</version>
 	
 	<developers>
 		<developer>
@@ -21,7 +21,7 @@
 	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.6</java.version>
 		<dubbo.version>2.6.0</dubbo.version>
-		<dynatrace-oneagent-sdk.version>1.0.3</dynatrace-oneagent-sdk.version>
+		<dynatrace-oneagent-sdk.version>1.1.0</dynatrace-oneagent-sdk.version>
 	</properties>
 
 	<dependencies>

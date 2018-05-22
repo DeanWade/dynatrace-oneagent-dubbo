@@ -25,9 +25,9 @@ public class DynatraceProviderFilter implements Filter {
 
 	private final OneAgentSDK oneAgentSdk;
 
-    private boolean isDisabled = false;
+    private boolean isDisabled;
 
-	private boolean isFullName = false;
+	private boolean isFullName;
 
 	public DynatraceProviderFilter() {
 		oneAgentSdk = OneAgentSDKFactory.createInstance();
@@ -64,7 +64,6 @@ public class DynatraceProviderFilter implements Filter {
 				incomingRemoteCall.start();
 			}
 		} catch (Throwable t) {
-            System.out.println(t.toString());
 		}
 		Result result = null;
 		try {

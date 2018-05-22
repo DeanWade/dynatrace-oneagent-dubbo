@@ -28,9 +28,9 @@ public class DynatraceConsumerFilter implements Filter {
 
 	private final OneAgentSDK oneAgentSdk;
 
-    private boolean isDisabled = false;
+    private boolean isDisabled;
 
-    private boolean isFullName = false;
+    private boolean isFullName;
 
 
 	public DynatraceConsumerFilter() {
