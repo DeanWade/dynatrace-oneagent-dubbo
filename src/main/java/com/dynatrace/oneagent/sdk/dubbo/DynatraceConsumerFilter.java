@@ -35,6 +35,7 @@ public class DynatraceConsumerFilter implements Filter {
 
 	public DynatraceConsumerFilter() {
 		oneAgentSdk = OneAgentSDKFactory.createInstance();
+		oneAgentSdk.addCustomRequestAttribute("service", "DynatraceConsumerFilter");
         isDisabled=Boolean.parseBoolean(System.getProperty(DYNATRACE_DUBBO_DISABLED));
         isFullName=Boolean.parseBoolean(System.getProperty(DYNATRACE_DUBBO_SERVICE_FULLNAME));
 	}
@@ -65,6 +66,7 @@ public class DynatraceConsumerFilter implements Filter {
 				String channelEndpoint = invoker.getUrl().getAddress();
 				outgoingRemoteCall = oneAgentSdk.traceOutgoingRemoteCall(serviceMethod, serviceName, serviceEndpoint,
 						ChannelType.TCP_IP, channelEndpoint);
+				outgoingRemoteCall.setProtocolName("dubbo");
 				outgoingRemoteCall.start();
 				String outgoingTag = outgoingRemoteCall.getDynatraceStringTag();
 				invocation.getAttachments().put(DYNATRACE_TAG_KEY, outgoingTag);

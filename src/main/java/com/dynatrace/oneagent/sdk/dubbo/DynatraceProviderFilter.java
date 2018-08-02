@@ -31,6 +31,7 @@ public class DynatraceProviderFilter implements Filter {
 
 	public DynatraceProviderFilter() {
 		oneAgentSdk = OneAgentSDKFactory.createInstance();
+		oneAgentSdk.addCustomRequestAttribute("service", "DynatraceProviderFilter");
         isDisabled=Boolean.parseBoolean(System.getProperty(DYNATRACE_DUBBO_DISABLED));
         isFullName=Boolean.parseBoolean(System.getProperty(DYNATRACE_DUBBO_SERVICE_FULLNAME));
 	}
@@ -60,6 +61,7 @@ public class DynatraceProviderFilter implements Filter {
 				String serviceName = isFullName?invoker.getInterface().getName():invoker.getInterface().getSimpleName();
 				String serviceEndpoint = invoker.getUrl().toServiceString();
 				incomingRemoteCall = oneAgentSdk.traceIncomingRemoteCall(serviceMethod, serviceName, serviceEndpoint);
+				incomingRemoteCall.setProtocolName("dubbo");
 				incomingRemoteCall.setDynatraceStringTag(tagString);
 				incomingRemoteCall.start();
 			}
