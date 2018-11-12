@@ -62,7 +62,7 @@ public class DynatraceConsumerFilter implements Filter {
 			if (isActive()) {
 				String serviceMethod = invocation.getMethodName();
 				String serviceName = isFullName?invoker.getInterface().getName():invoker.getInterface().getSimpleName();
-				String serviceEndpoint = invoker.getUrl().toServiceString();
+				String serviceEndpoint = invoker.getUrl().getPath();
 				String channelEndpoint = invoker.getUrl().getAddress();
 				outgoingRemoteCall = oneAgentSdk.traceOutgoingRemoteCall(serviceMethod, serviceName, serviceEndpoint,
 						ChannelType.TCP_IP, channelEndpoint);

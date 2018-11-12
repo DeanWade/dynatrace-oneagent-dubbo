@@ -59,7 +59,7 @@ public class DynatraceProviderFilter implements Filter {
 			if (tagString != null && isActive()) {
 				String serviceMethod = invocation.getMethodName();
 				String serviceName = isFullName?invoker.getInterface().getName():invoker.getInterface().getSimpleName();
-				String serviceEndpoint = invoker.getUrl().toServiceString();
+				String serviceEndpoint = invoker.getUrl().getPath();
 				incomingRemoteCall = oneAgentSdk.traceIncomingRemoteCall(serviceMethod, serviceName, serviceEndpoint);
 				incomingRemoteCall.setProtocolName("dubbo");
 				incomingRemoteCall.setDynatraceStringTag(tagString);
