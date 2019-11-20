@@ -55,8 +55,8 @@ public class DynatraceProviderFilter implements Filter {
         }
 		IncomingRemoteCallTracer incomingRemoteCall = null;
 		try {
-			String tagString = invocation.getAttachments().get(DYNATRACE_TAG_KEY);
-			if (tagString != null && isActive()) {
+			if (isActive()) {
+				String tagString = invocation.getAttachments().get(DYNATRACE_TAG_KEY);
 				String serviceMethod = invocation.getMethodName();
 				String serviceName = isFullName?invoker.getInterface().getName():invoker.getInterface().getSimpleName();
 				String serviceEndpoint = invoker.getUrl().getPath();
