@@ -18,26 +18,17 @@ import java.util.logging.Logger;
 @Activate(group = Constants.CONSUMER, order = Integer.MAX_VALUE)
 public class DynatraceConsumerFilter implements Filter {
 
-//    private static final com.alibaba.dubbo.common.logger.Logger logger = LoggerFactory.getLogger(DynatraceConsumerFilter.class);
-
     private static final String DYNATRACE_TAG_KEY = "x-dynatrace-tag";
 
     private static final String DYNATRACE_DUBBO_DISABLED = "dynatrace.dubbo.disable";
-
-	private static final String DYNATRACE_DUBBO_SERVICE_FULLNAME = "dynatrace.dubbo.service.fullname";
 
 	private final OneAgentSDK oneAgentSdk;
 
     private boolean isDisabled;
 
-    private boolean isFullName;
-
-
 	public DynatraceConsumerFilter() {
 		oneAgentSdk = OneAgentSDKFactory.createInstance();
-		oneAgentSdk.addCustomRequestAttribute("service", "DynatraceConsumerFilter");
         isDisabled=Boolean.parseBoolean(System.getProperty(DYNATRACE_DUBBO_DISABLED));
-        isFullName=Boolean.parseBoolean(System.getProperty(DYNATRACE_DUBBO_SERVICE_FULLNAME));
 	}
 
 	private boolean isActive() {
@@ -61,35 +52,34 @@ public class DynatraceConsumerFilter implements Filter {
 		try {
 			if (isActive()) {
 				String serviceMethod = invocation.getMethodName();
-				String serviceName = isFullName?invoker.getInterface().getName():invoker.getInterface().getSimpleName();
+				String serviceName = invoker.getInterface().getSimpleName();
 				String serviceEndpoint = invoker.getUrl().getPath();
 				String channelEndpoint = invoker.getUrl().getAddress();
-				outgoingRemoteCall = oneAgentSdk.traceOutgoingRemoteCall(serviceMethod, serviceName, serviceEndpoint,
+				outgoingRemoteCall = oneAgentSdk.traceOutgoingRemoteCall(
+						serviceMethod, serviceName, serviceEndpoint,
 						ChannelType.TCP_IP, channelEndpoint);
 				outgoingRemoteCall.setProtocolName("dubbo");
 				outgoingRemoteCall.start();
 				String outgoingTag = outgoingRemoteCall.getDynatraceStringTag();
 				invocation.getAttachments().put(DYNATRACE_TAG_KEY, outgoingTag);
 			}
-		} catch (Exception e) {
-		}
-		Result result = null;
+		} catch (Exception e) { }
+
 		try {
-			result = invoker.invoke(invocation);
-			return result;
+			//line 70=1.9.0
+			//line 71=2.0.0
+			return invoker.invoke(invocation);
 		} catch (RpcException e) {
-			if (outgoingRemoteCall != null) {
-				outgoingRemoteCall.error(e);
-			}
 			throw e;
 		} finally {
-			if (outgoingRemoteCall != null) {
-				if(result != null && result.hasException()){
-					outgoingRemoteCall.error(result.getException());
+			try {
+				if (outgoingRemoteCall != null) {
+					outgoingRemoteCall.end();
 				}
-				outgoingRemoteCall.end();
-			}
+			} catch (Throwable t) {}
 		}
 	}
 
+	public void version_dynatrace_oneagent_sdk_1_4_0(){}
+	public void version_dynatrace_oneagent_dubbo_2_0_0(){}
 }

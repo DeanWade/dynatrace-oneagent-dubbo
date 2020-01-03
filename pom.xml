@@ -3,8 +3,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.dynatrace</groupId>
-	<artifactId>dynatrace-oneagent-dubbo</artifactId>
-	<version>1.7.0</version>
+	<artifactId>dynatrace-oneagent-dubbo-midea</artifactId>
+	<version>2.0.0</version>
+	<packaging>jar</packaging>
 	
 	<developers>
 		<developer>
@@ -21,7 +22,7 @@
 	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.6</java.version>
 		<dubbo.version>2.6.0</dubbo.version>
-		<dynatrace-oneagent-sdk.version>1.6.0</dynatrace-oneagent-sdk.version>
+		<dynatrace-oneagent-sdk.version>1.4.0</dynatrace-oneagent-sdk.version>
 	</properties>
 
 	<dependencies>
@@ -52,7 +53,16 @@
 					</archive>
 				</configuration>
 			</plugin>
-			
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.2.0</version>
+				<configuration>
+					<attach>false</attach>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
