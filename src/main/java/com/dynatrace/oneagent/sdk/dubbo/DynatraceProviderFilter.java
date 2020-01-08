@@ -2,12 +2,7 @@ package com.dynatrace.oneagent.sdk.dubbo;
 
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.extension.Activate;
-import com.alibaba.dubbo.common.logger.LoggerFactory;
-import com.alibaba.dubbo.rpc.Filter;
-import com.alibaba.dubbo.rpc.Invocation;
-import com.alibaba.dubbo.rpc.Invoker;
-import com.alibaba.dubbo.rpc.Result;
-import com.alibaba.dubbo.rpc.RpcException;
+import com.alibaba.dubbo.rpc.*;
 import com.dynatrace.oneagent.sdk.OneAgentSDKFactory;
 import com.dynatrace.oneagent.sdk.api.IncomingRemoteCallTracer;
 import com.dynatrace.oneagent.sdk.api.OneAgentSDK;
@@ -60,7 +55,12 @@ public class DynatraceProviderFilter implements Filter {
 			}
 		} catch (Throwable t) {}
 
+		Result result = null;
 		try {
+
+
+
+
 
 
 
@@ -68,12 +68,52 @@ public class DynatraceProviderFilter implements Filter {
 
 			//line 70=1.9.0
 			//line 71=2.0.0
-			return invoker.invoke(invocation);
+			//line 72=2.1.0
+			//line 73=2.2.0
+			//line 74=2.3.0
+			result = invoker.invoke(invocation);
+			return result;
 		} catch (RpcException e) {
+			try {
+				if (incomingRemoteCall != null) {
+					if(e.getCause() != null){
+						String causeExceptionName = e.getCause().getClass().getName();
+						if(causeExceptionName.endsWith("BaseException") || causeExceptionName.endsWith("RuntimeException")){
+							//do nothing
+						}else{
+							incomingRemoteCall.error(e);
+						}
+					}else{
+						incomingRemoteCall.error(e);
+					}
+				}
+			} catch (Throwable t) {}
 			throw e;
 		} finally {
 			try {
 				if (incomingRemoteCall != null) {
+					if(result != null && result.hasException()){
+						Throwable e = result.getException();
+						if( e instanceof  RpcException){//RPCException
+							if(e.getCause() != null){
+								String causeExceptionName = e.getCause().getClass().getName();
+								if(causeExceptionName.endsWith("BaseException") || causeExceptionName.endsWith("RuntimeException")){
+									//do nothing
+								}else{
+									incomingRemoteCall.error(e); // not BaseException
+								}
+							}else{
+								incomingRemoteCall.error(e); // no cause exception
+							}
+						}else{// not RpcException
+							String causeExceptionName = e.getClass().getName();
+							if(causeExceptionName.endsWith("BaseException") || causeExceptionName.endsWith("RuntimeException")){
+								//do nothing
+							}else{
+								incomingRemoteCall.error(e); // not BaseException
+							}
+						}
+					}
 					incomingRemoteCall.end();
 				}
 			} catch (Throwable t) {}
@@ -81,5 +121,5 @@ public class DynatraceProviderFilter implements Filter {
 	}
 
 	public void version_dynatrace_oneagent_sdk_1_4_0(){}
-	public void version_dynatrace_oneagent_dubbo_midea_2_0_0(){}
+	public void version_dynatrace_oneagent_dubbo_midea_2_3_0(){}
 }

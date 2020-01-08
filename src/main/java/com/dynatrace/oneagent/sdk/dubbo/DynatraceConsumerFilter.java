@@ -64,16 +64,56 @@ public class DynatraceConsumerFilter implements Filter {
 				invocation.getAttachments().put(DYNATRACE_TAG_KEY, outgoingTag);
 			}
 		} catch (Exception e) { }
-
+		Result result = null;
 		try {
 			//line 70=1.9.0
 			//line 71=2.0.0
-			return invoker.invoke(invocation);
+			//line 72=2.1.0
+			//line 73=2.2.0
+			//line 74=2.3.0
+			result = invoker.invoke(invocation);
+			return result;
 		} catch (RpcException e) {
+			try {
+				if (outgoingRemoteCall != null) {
+					if(e.getCause() != null){
+						String causeExceptionName = e.getCause().getClass().getName();
+						if(causeExceptionName.endsWith("BaseException") || causeExceptionName.endsWith("RuntimeException")){
+							//do nothing
+						}else{
+							outgoingRemoteCall.error(e);
+						}
+					}else{
+						outgoingRemoteCall.error(e);
+					}
+				}
+			} catch (Throwable t) {}
 			throw e;
 		} finally {
 			try {
 				if (outgoingRemoteCall != null) {
+					if(result != null && result.hasException()){
+						Throwable e = result.getException();
+						if( e instanceof  RpcException){//RPCException
+							if(e.getCause() != null){
+								String causeExceptionName = e.getCause().getClass().getName();
+								if(causeExceptionName.endsWith("BaseException") || causeExceptionName.endsWith("RuntimeException")){
+									//do nothing
+								}else{
+									outgoingRemoteCall.error(e); // not BaseException
+								}
+							}else{
+								outgoingRemoteCall.error(e); // no cause exception
+							}
+						}else{// not RpcException
+							String causeExceptionName = e.getClass().getName();
+							if(causeExceptionName.endsWith("BaseException") || causeExceptionName.endsWith("RuntimeException")){
+								//do nothing
+							}else{
+								outgoingRemoteCall.error(e); // not BaseException
+							}
+						}
+					}
 					outgoingRemoteCall.end();
 				}
 			} catch (Throwable t) {}
@@ -81,5 +121,5 @@ public class DynatraceConsumerFilter implements Filter {
 	}
 
 	public void version_dynatrace_oneagent_sdk_1_4_0(){}
-	public void version_dynatrace_oneagent_dubbo_2_0_0(){}
+	public void version_dynatrace_oneagent_dubbo_2_3_0(){}
 }
