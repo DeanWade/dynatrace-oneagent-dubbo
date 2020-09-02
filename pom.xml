@@ -4,7 +4,7 @@
 
 	<groupId>com.dynatrace</groupId>
 	<artifactId>dynatrace-oneagent-dubbo</artifactId>
-	<version>1.7.0</version>
+	<version>1.6.0</version>
 	
 	<developers>
 		<developer>
@@ -23,6 +23,13 @@
 		<dubbo.version>2.6.0</dubbo.version>
 		<dynatrace-oneagent-sdk.version>1.6.0</dynatrace-oneagent-sdk.version>
 	</properties>
+
+	<distributionManagement>
+		<repository>
+			<id>WeiDing0788</id>
+			<url>https://pkgs.dev.azure.com/WeiDing0788/_packaging/WeiDing0788/maven/v1</url>
+		</repository>
+	</distributionManagement>
 
 	<dependencies>
 		<dependency>

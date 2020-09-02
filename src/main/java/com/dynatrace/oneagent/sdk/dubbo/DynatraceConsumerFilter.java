@@ -2,42 +2,26 @@ package com.dynatrace.oneagent.sdk.dubbo;
 
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.extension.Activate;
-import com.alibaba.dubbo.common.logger.LoggerFactory;
-import com.alibaba.dubbo.rpc.Filter;
-import com.alibaba.dubbo.rpc.Invocation;
-import com.alibaba.dubbo.rpc.Invoker;
-import com.alibaba.dubbo.rpc.Result;
-import com.alibaba.dubbo.rpc.RpcException;
+import com.alibaba.dubbo.rpc.*;
 import com.dynatrace.oneagent.sdk.OneAgentSDKFactory;
 import com.dynatrace.oneagent.sdk.api.OneAgentSDK;
 import com.dynatrace.oneagent.sdk.api.OutgoingRemoteCallTracer;
 import com.dynatrace.oneagent.sdk.api.enums.ChannelType;
 
-import java.util.logging.Logger;
-
 @Activate(group = Constants.CONSUMER, order = Integer.MAX_VALUE)
 public class DynatraceConsumerFilter implements Filter {
-
-//    private static final com.alibaba.dubbo.common.logger.Logger logger = LoggerFactory.getLogger(DynatraceConsumerFilter.class);
 
     private static final String DYNATRACE_TAG_KEY = "x-dynatrace-tag";
 
     private static final String DYNATRACE_DUBBO_DISABLED = "dynatrace.dubbo.disable";
 
-	private static final String DYNATRACE_DUBBO_SERVICE_FULLNAME = "dynatrace.dubbo.service.fullname";
-
 	private final OneAgentSDK oneAgentSdk;
 
     private boolean isDisabled;
 
-    private boolean isFullName;
-
-
 	public DynatraceConsumerFilter() {
 		oneAgentSdk = OneAgentSDKFactory.createInstance();
-		oneAgentSdk.addCustomRequestAttribute("service", "DynatraceConsumerFilter");
         isDisabled=Boolean.parseBoolean(System.getProperty(DYNATRACE_DUBBO_DISABLED));
-        isFullName=Boolean.parseBoolean(System.getProperty(DYNATRACE_DUBBO_SERVICE_FULLNAME));
 	}
 
 	private boolean isActive() {
@@ -61,11 +45,10 @@ public class DynatraceConsumerFilter implements Filter {
 		try {
 			if (isActive()) {
 				String serviceMethod = invocation.getMethodName();
-				String serviceName = isFullName?invoker.getInterface().getName():invoker.getInterface().getSimpleName();
+				String serviceName = invoker.getInterface().getSimpleName();
 				String serviceEndpoint = invoker.getUrl().getPath();
 				String channelEndpoint = invoker.getUrl().getAddress();
-				outgoingRemoteCall = oneAgentSdk.traceOutgoingRemoteCall(serviceMethod, serviceName, serviceEndpoint,
-						ChannelType.TCP_IP, channelEndpoint);
+				outgoingRemoteCall = oneAgentSdk.traceOutgoingRemoteCall(serviceMethod, serviceName, serviceEndpoint, ChannelType.TCP_IP, channelEndpoint);
 				outgoingRemoteCall.setProtocolName("dubbo");
 				outgoingRemoteCall.start();
 				String outgoingTag = outgoingRemoteCall.getDynatraceStringTag();
