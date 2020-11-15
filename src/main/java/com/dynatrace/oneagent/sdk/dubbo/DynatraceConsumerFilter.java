@@ -13,15 +13,10 @@ public class DynatraceConsumerFilter implements Filter {
 
     private static final String DYNATRACE_TAG_KEY = "x-dynatrace-tag";
 
-    private static final String DYNATRACE_DUBBO_DISABLED = "dynatrace.dubbo.disable";
-
 	private final OneAgentSDK oneAgentSdk;
-
-    private boolean isDisabled;
 
 	public DynatraceConsumerFilter() {
 		oneAgentSdk = OneAgentSDKFactory.createInstance();
-        isDisabled=Boolean.parseBoolean(System.getProperty(DYNATRACE_DUBBO_DISABLED));
 	}
 
 	private boolean isActive() {
@@ -37,22 +32,25 @@ public class DynatraceConsumerFilter implements Filter {
 		}
 	}
 
+	private void isVersion20201112_Dubbo253_SDK14() {
+	}
+
 	public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
-	    if(isDisabled){
-            return invoker.invoke(invocation);
-        }
 		OutgoingRemoteCallTracer outgoingRemoteCall = null;
 		try {
 			if (isActive()) {
-				String serviceMethod = invocation.getMethodName();
-				String serviceName = invoker.getInterface().getSimpleName();
-				String serviceEndpoint = invoker.getUrl().getPath();
-				String channelEndpoint = invoker.getUrl().getAddress();
-				outgoingRemoteCall = oneAgentSdk.traceOutgoingRemoteCall(serviceMethod, serviceName, serviceEndpoint, ChannelType.TCP_IP, channelEndpoint);
-				outgoingRemoteCall.setProtocolName("dubbo");
-				outgoingRemoteCall.start();
-				String outgoingTag = outgoingRemoteCall.getDynatraceStringTag();
-				invocation.getAttachments().put(DYNATRACE_TAG_KEY, outgoingTag);
+				String tagString = invocation.getAttachments().get(DYNATRACE_TAG_KEY);
+				if(tagString == null || "".equals(tagString)){
+					String serviceMethod = invocation.getMethodName();
+					String serviceName = invoker.getInterface().getSimpleName();
+					String serviceEndpoint = invoker.getUrl().getPath();
+					String channelEndpoint = invoker.getUrl().getAddress();
+					outgoingRemoteCall = oneAgentSdk.traceOutgoingRemoteCall(serviceMethod, serviceName, serviceEndpoint, ChannelType.TCP_IP, channelEndpoint);
+					outgoingRemoteCall.setProtocolName("dubbo");
+					outgoingRemoteCall.start();
+					tagString = outgoingRemoteCall.getDynatraceStringTag();
+					invocation.getAttachments().put(DYNATRACE_TAG_KEY, tagString);
+				}
 			}
 		} catch (Exception e) {
 		}
