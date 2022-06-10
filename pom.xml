@@ -20,7 +20,7 @@
 	<properties>
 	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.6</java.version>
-		<dubbo.version>2.5.3</dubbo.version>
+		<dubbo.version>2.6.12</dubbo.version>
 		<dynatrace-oneagent-sdk.version>1.4.0</dynatrace-oneagent-sdk.version>
 	</properties>
 
